@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 
 
-G2_22 = GpnN(2,-2,0) #initialization
+G2_22 = GpnN(2,-2,2) #initialization
 G2_22.generate_numbers()
 #G2_22.representation_tree()
 #G2_22.console_printing()
@@ -22,9 +22,9 @@ for i in G2_22.numbers:
     i_0 += 1'''
 #G2_22.representation_tree()
 
-G2_22.matrix()
+#G2_22.matrix()
 
 #G2_22.ODESols()
-#G2_22.export_gif()
+G2_22.export_gif()
 
   

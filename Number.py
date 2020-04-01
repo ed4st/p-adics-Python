@@ -58,4 +58,4 @@ class Number:
     if(c == len(self.digits)):
       return 0
 
-    return self.p**(-self.order())
+    return self.p**(-self.order())  

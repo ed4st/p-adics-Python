@@ -291,7 +291,7 @@ class GpnN:
     sub = self.p_sub(i,j)
     norm = sub.norm()
     order = sub.order()
-    return order#1/(self.p_sub(i,j).norm()**alpha + 1)
+    return 1/(self.p_sub(i,j).norm()**alpha + 1)
 
   def matrix(self):
     W = []
@@ -300,10 +300,7 @@ class GpnN:
       for j in self.numbers:
         aux.append(self.fij(2,i,j))
       W.append(aux)
-    
-    for fila in W:
-      print(fila)
-    
+
     sum_row1 = sum(W[0]) 
     for i in range(len(W)):
       W[i] = [j*(sum_row1**(-1)) for j in (W[i])]
@@ -322,7 +319,7 @@ class GpnN:
       for j in range(len(self.numbers)):
         c = W[i][j]
         #ax.text(i, j, f"{c:.2f}", va='center', ha='center')#text(i, j, f"{c:.2f}", va='center', ha='center')
-    plt.show()
+    #plt.show()
     return W
 #-------------------------Solving the Master Equation System---------------------------
   def __model(self, u, t):
@@ -351,7 +348,7 @@ class GpnN:
     #u0 = random.sample(range(0,1),len(self.numbers))
     
     #time points
-    t = np.linspace(0,1,5)
+    t = np.linspace(0,10,10)
 
     u = odeint(self.__model,u0,t)
     return [u,t]
@@ -439,7 +436,7 @@ class GpnN:
     plt.axis('equal')
 
     #vertical colorbar
-    sm = plt.cm.ScalarMappable(cmap = cm_aux)
+    sm = plt.cm.ScalarMappable(cmap = cm.jet)#cm_aux)
     sm._A = []
     cbar = plt.colorbar(sm)
     cbar.set_label('', rotation=270)
@@ -456,4 +453,4 @@ class GpnN:
       print("------------------------")
       frame = self.animate(u_i,t_i)
       frames.append(frame)
-    gif.save(frames,"ojala.gif",duration=3000)
+    gif.save(frames,"ojala.gif",duration=300)

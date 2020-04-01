@@ -52,7 +52,7 @@ class GpnN:
       arr  =  []
       arr.extend(p) 
           
-      numbers_aux.append(Number(self.p,self.n,self.N,arr)) 
+      numbers_aux.append(Number(self.p,self.n,self.N,arr[::-1])) 
           
       self.numbers  =  numbers_aux
       i  =  i + 1

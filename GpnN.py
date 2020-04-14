@@ -242,7 +242,8 @@ class GpnN:
         color_of_edges.append(basic_colors[j])
 
     pos  =  graphviz_layout(G, prog = 'twopi', args = '')
-    plt.figure(figsize = (8,8))
+    tam = self.__M + self.__m + self.p
+    plt.figure(figsize = (int(tam**1.1),int(tam**1.1)))
 
     name = 'G' + str(self.p) + '_' + str(abs(self.n)) + str(self.N)
     plt.title(name)
@@ -273,16 +274,38 @@ class GpnN:
     
     cm_aux = ListedColormap(unique_color)#creating a color map
                         
-    nx.draw(G, pos, node_size = 100, alpha = 0.7, node_color  =  color_norms, edge_color  = color_of_edges,with_labels = False)
+    nx.draw(G, pos, node_size = int(1000/(tam**1.5)), alpha = 0.7, node_color  =  color_norms, edge_color  = color_of_edges,with_labels = False)
     plt.axis('equal')
 
     #vertical colorbar
     sm = plt.cm.ScalarMappable(cmap = cm_aux)
     sm._A = []
-    cbar = plt.colorbar(sm)
-    cbar.ax.set_yticklabels(unique_norms)
+
+    mn = min(unique_norms)      # colorbar min value
+    mx = max(unique_norms)       # colorbar max value
+    
+    m1 = (mx-mn)/4
+    m2 = (mx-mn)/2
+    m3 = (mx-mn)*3/4  
+    tks = linspace(0,1,2*len(unique_norms)+1)
+
+    cbar = plt.colorbar(sm, ticks = tks)
+    
+    labels = []
+
+    labels.append('')
+    labels.append('$0$')
+
+    for i in range(1,len(unique_norms)):
+      labels.append('')
+      labels.append('$'+str(self.p)+'^{' + str(i-self.__m-1)+'}$')
+    labels.append('')
+    #cbar.set_ticks([mn,md,mx])
+    #cbar.set_ticklabels([mn,md,mx])
+    cbar.ax.set_yticklabels(labels)
+    #print(labels)
     cbar.set_label('Norm', rotation=270)
-    plt.show()
+    #plt.show()
     plt.savefig(name + '.png')    
     
 #--------------------------Parisi_Matrix--------------------------

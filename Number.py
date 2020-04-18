@@ -27,7 +27,7 @@ class Number:
     self.__M = M
 
   #-------------------------------------------------------
-  def show(self):#shows the digits of actual number
+  def show(self):#shows the digits of current number
     print(self.digits)
   
   def order(self): #computes the order of a p-adic number

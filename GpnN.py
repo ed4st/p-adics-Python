@@ -23,6 +23,8 @@ class GpnN:
   numbers = []
 
 
+  __all_solutions_set = set()
+
   def __init__(self,p ,n ,N):
     self.p = p 
     self.n = n 
@@ -220,7 +222,8 @@ class GpnN:
     nx.set_node_attributes(G,norm,'norm')
     for i in range(len(G.nodes)):
           G.nodes[i]['norm']  =  0.0
-    
+    if(len(self.numbers) == 0):
+      print("GPnN have no numbers initialized")
     for i in range(len(leaf_nodes)):
       G.nodes[leaf_nodes[i]]['norm']  =  self.numbers[i].norm()
       
@@ -310,18 +313,17 @@ class GpnN:
     
 #--------------------------Parisi_Matrix--------------------------
   #following function returns the (i,j)-th value of Parisi Matrix
-  def fij(self, alpha, i: Number, j: Number):
-    sub = self.p_sub(i,j)
-    norm = sub.norm()
-    order = sub.order()
-    return 1/(self.p_sub(i,j).norm()**alpha + 1)
+  def fij(self, alpha, constant, i: Number, j: Number):
+    return constant/(self.p_sub(i,j).norm()**alpha + 1)
 
   def matrix(self):
+    alpha = 2
+    constant = 3
     W = []
     for i in self.numbers:
       aux = []
       for j in self.numbers:
-        aux.append(self.fij(2,i,j))
+        aux.append(self.fij(alpha,constant,i,j))
       W.append(aux)
 
     sum_row1 = sum(W[0]) 
@@ -334,7 +336,8 @@ class GpnN:
     w0 =  - sum(row_copy)
     for i in range(len(W)):  
       W[i][i] = w0 
-      
+    
+    '''
     #matrix visualization
     fig, ax = plt.subplots()
     ax.matshow(W, cmap = plt.cm.get_cmap("jet"))
@@ -342,7 +345,25 @@ class GpnN:
       for j in range(len(self.numbers)):
         c = W[i][j]
         #ax.text(i, j, f"{c:.2f}", va='center', ha='center')#text(i, j, f"{c:.2f}", va='center', ha='center')
+    
+    #colorbar
+    sm = plt.cm.ScalarMappable(cmap = cm.jet)
+    sm._A = []
+
+    mn = min(W[0])      # colorbar min value
+    mx = max(W[0])       # colorbar max value
+    
+    md = (mx-mn)/2
+    tks = linspace(0,1,3)#2*(self.__m+self.__M+1))
+
+    cbar = plt.colorbar(sm, ticks = tks)
+    cbar.ax.set_yticklabels([f"{mn:.2f}",f"{md:.2f}" , f"{mx:.2f}"])
     #plt.show()
+    name = 'G'+str(self.p)+'_'+str(-self.n)+str(self.N)
+    plt.title('Transition Matrix of ' + name + ' with $\\alpha='+str(alpha)+'$ and $C='+str(constant)+'$')
+    plt.savefig('matrix'+name+'.png')'''
+
+
     return W
 #-------------------------Solving the Master Equation System---------------------------
   def __model(self, u, t):
@@ -350,7 +371,7 @@ class GpnN:
     dudts = []
     for i in range(len(W)):
       auxeq = 0
-      for j in range(len(W)):
+      for j in range(len(W)):        
         auxeq += W[i][j]*u[j]
       dudts.append(auxeq)
     return dudts
@@ -362,20 +383,25 @@ class GpnN:
     #u0 = np.random.normal(len(self.numbers)/2,1,len(self.numbers))
     
     #ones
-    u0 = [1 for i in range(len(self.numbers))]
+    #u0 = [1 for i in range(len(self.numbers))]
     
     #median = 0, variance = 1
     #u0 = np.random.normal(0,1,len(self.numbers))
     
     #random list from 0 to 1
     #u0 = random.sample(range(0,1),len(self.numbers))
-    
+    u0 = [random.random() for i in range(len(self.numbers))]
     #time points
-    t = np.linspace(0,10,10)
+    t = np.linspace(0,10,4)
 
     u = odeint(self.__model,u0,t)
+    for u_i in u:
+      self.__all_solutions_set.update(set(u_i))
     return [u,t]
+
+
   #--------------------------Creating image transitions---------------
+  
   @gif.frame
   def animate(self, boundary, time):
     try:
@@ -461,19 +487,23 @@ class GpnN:
     #vertical colorbar
     sm = plt.cm.ScalarMappable(cmap = cm.jet)#cm_aux)
     sm._A = []
-    cbar = plt.colorbar(sm)
-    cbar.set_label('', rotation=270)
-    cbar.set_clim(-2.0, 2.0)
+    mn = min(self.__all_solutions_set)
+    mx = max(self.__all_solutions_set)
+    md = (mn+mx)/2
+    tks = linspace(0,1,3)
+    cbar = plt.colorbar(sm, ticks = tks )
+    cbar.ax.set_yticklabels([mn, md, mx])
 
 
     #plt.show()
-
+  
   def export_gif(self):
     frames = []
     u = self.ODESols()
+    print(self.__all_solutions_set)
     for u_i, t_i in zip(u[0],u[1]):
       print(u_i)
       print("------------------------")
       frame = self.animate(u_i,t_i)
       frames.append(frame)
-    gif.save(frames,"ojala.gif",duration=300)
+    gif.save(frames,"ojala.gif",duration=3000)

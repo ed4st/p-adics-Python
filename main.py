@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import time
 
 start_time = time.time()
-G2_22 = GpnN(2,0,1) #initialization
+G2_22 = GpnN(2,0,5) #initialization
 G2_22.generate_numbers()
 #G2_22.matrix()
 #G2_22.representation_tree()

@@ -24,6 +24,8 @@ class GpnN:
 
 
   __all_solutions_set = set()
+  __all_solutions_dict = dict() # a dictionary that contains sorted solutions as keys 
+                                # and a colors as values
 
   def __init__(self,p ,n ,N):
     self.p = p 
@@ -376,34 +378,53 @@ class GpnN:
       dudts.append(auxeq)
     return dudts
   
-  def ODESols(self):
-    #initial condition
-    
-    #normal
-    #u0 = np.random.normal(len(self.numbers)/2,1,len(self.numbers))
-    
-    #ones
-    #u0 = [1 for i in range(len(self.numbers))]
-    
-    #median = 0, variance = 1
-    #u0 = np.random.normal(0,1,len(self.numbers))
-    
-    #random list from 0 to 1
-    #u0 = random.sample(range(0,1),len(self.numbers))
-    u0 = [random.random() for i in range(len(self.numbers))]
+  def ODESols(self, type_ic = None):
     #time points
     t = np.linspace(0,10,4)
+
+    #initial condition
+    u0 = []
+    
+    if(type_ic != None):
+      #random initial condition
+      if(type_ic == 'random'):
+        u0 = [random.random() for i in range(len(self.numbers))]
+        plt.plot(u0)
+        plt.show()
+      #ones initial condition
+      elif(type_ic == 'ones'):
+        u0 = [1 for i in range(len(self.numbers))]
+        plt.plot(u0)
+        plt.show()
+    #normal initial condition by default
+    else:
+        #median = 0, variance = 1
+        u0 = np.random.normal(0,1,len(self.numbers))
+        plt.plot(u0)
+        plt.show()
 
     u = odeint(self.__model,u0,t)
     for u_i in u:
       self.__all_solutions_set.update(set(u_i))
+    self.__color_solutions()
     return [u,t]
+
+  def __color_solutions(self):
+    all_sols_lenght =  len(self.__all_solutions_set)
+    cm_subsection = linspace(0, 1, all_sols_lenght) 
+    all_solutions_list = sorted(list(self.__all_solutions_set))
+    all_colors = [ cm.jet(x) for x in cm_subsection ]
+    
+    for i in range(all_sols_lenght):
+      key = all_solutions_list[i]
+      value = all_colors[i]
+      self.__all_solutions_dict[key] = value
 
 
   #--------------------------Creating image transitions---------------
   
   @gif.frame
-  def animate(self, boundary, time):
+  def animate(self, boundary, time, type_ic = None):
     try:
         import pygraphviz
         from networkx.drawing.nx_agraph import graphviz_layout
@@ -439,7 +460,6 @@ class GpnN:
     #Creating a list of p colors
     basic_colors = ['k','r','b','gray','green','c','y','m']
     if(self.p>len(basic_colors)-1):
-      
       cm_linspace = linspace(0.0, 1.0, self.p-len(basic_colors))
       basic_colors = basic_colors + [cm.brg(x) for x in cm_linspace] 
     color_of_edges = []
@@ -449,39 +469,37 @@ class GpnN:
         color_of_edges.append(basic_colors[j])
 
     pos  =  graphviz_layout(G, prog = 'twopi', args = '')
-    plt.figure(figsize = (8,8))
+    tam = self.__M + self.__m + self.p
+    plt.figure(figsize = (int(tam**1.1),int(tam**1.1)))
+
 
     name = 'G' + str(self.p) + '_' + str(abs(self.n)) + str(self.N)
-    plt.title(name)
+    
+    if(type_ic != None):
+      #random initial condition
+      if(type_ic == 'random'):
+        plt.title(name + ' difussion model with randomly distributed initial condition vector')
+      #ones initial condition
+      elif(type_ic == 'ones'):
+        plt.title(name + ' difussion model with $\\vec{1}$ initial condition vector')
+    #normal initial condition by default
+    else:
+        #median = 0, variance = 1
+        plt.title(name + ' difussion model with normally distributed initial condition vector')
     plt.text(2, 6, '$t =' + f"{time:.2f}" + '$', fontsize=15)
 
-    norms_set = set(norms)
-    unique_norms = []
-    for i in norms_set: 
-      unique_norms.append(i)
-    #creating a list of colors based 
-    # on how many diferents norms are
-    start = 0.0
-    stop = 1.0
-    cm_subsection = linspace(start, stop, len(norms_set)) 
-    norms_color_set = [ cm.jet(x) for x in cm_subsection ]
     
-    unique_color = []  
-    for i in norms_color_set:
-      unique_color.append(i)
     
-    unique_norms.sort()
-    color_norms = []
+
+    boundary_colors = []
     for i in norms:
       if(i == 0.0):
-        color_norms.append('white')
+        boundary_colors.append('white')
       else:
-        index = unique_norms.index(i)
-        color_norms.append(unique_color[index])
+        boundary_colors.append(self.__all_solutions_dict[i])
     
-    cm_aux = ListedColormap(unique_color)#creating a color map
                         
-    nx.draw(G, pos, node_size = 100, alpha = 0.7, node_color  =  color_norms, edge_color  = color_of_edges,with_labels = False)
+    nx.draw(G, pos, node_size = int(1000/(tam**1.5)), alpha = 0.7, node_color  =  boundary_colors , edge_color  = color_of_edges,with_labels = False)
     plt.axis('equal')
 
     #vertical colorbar
@@ -492,18 +510,30 @@ class GpnN:
     md = (mn+mx)/2
     tks = linspace(0,1,3)
     cbar = plt.colorbar(sm, ticks = tks )
-    cbar.ax.set_yticklabels([mn, md, mx])
-
+    cbar.ax.set_yticklabels([f"{mn:.3f}", f"{md:.3f}",f"{mx:.3f}"])
+    cbar.set_label('solution values', rotation=270)
 
     #plt.show()
-  
-  def export_gif(self):
+  '''
+  following function returns a gif showing
+  the behaviour of ultrametric difussion equations: 
+  type_ic: type of initial condition(normal,random,ones)
+           default = normal
+           establishes the values of initial condition vector.
+           It can be distributed normally with mean 0 and variance 1,
+           randomically and constant(ones in every entry of initial
+           condition vector).  
+  '''
+  def export_gif(self, type_ic = None ):
     frames = []
-    u = self.ODESols()
-    print(self.__all_solutions_set)
+    u = self.ODESols(type_ic)
+    
     for u_i, t_i in zip(u[0],u[1]):
-      print(u_i)
-      print("------------------------")
-      frame = self.animate(u_i,t_i)
+      frame = self.animate(u_i,t_i,type_ic)
       frames.append(frame)
-    gif.save(frames,"ojala.gif",duration=3000)
+
+    name = 'G' + str(self.p) + '_' + str(abs(self.n)) + str(self.N)
+    if(type_ic!=None):
+      gif.save(frames,name + "_" +type_ic +"_difussion.gif",duration=1000)
+    else:
+      gif.save(frames,name + "_normal_difussion.gif",duration=1000)

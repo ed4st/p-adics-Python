@@ -396,12 +396,18 @@ class GpnN:
         u0 = [1 for i in range(len(self.numbers))]
         plt.plot(u0)
         plt.show()
-    #normal initial condition by default
+    #gauss bell like initial condition by default
     else:
-        #median = 0, variance = 1
-        u0 = np.random.normal(0,1,len(self.numbers))
-        plt.plot(u0)
-        plt.show()
+      #gauss bell centered at GpnN order divided by 2
+      center = len(self.numbers)/2
+      #creating a partition on the interval [center-1,center+1] 
+      #of size |GpnN|  
+      partition = linspace(center-0.5 ,center+0.5,len(self.numbers))
+      #here we evaluate the partition created above in
+      #gauss bell function centered at GpnN order divided by 2 
+      u0= np.exp((partition-center)**2)/self.p
+      #plt.plot(u0)
+      #plt.show()
 
     u = odeint(self.__model,u0,t)
     for u_i in u:
@@ -536,4 +542,4 @@ class GpnN:
     if(type_ic!=None):
       gif.save(frames,name + "_" +type_ic +"_difussion.gif",duration=1000)
     else:
-      gif.save(frames,name + "_normal_difussion.gif",duration=1000)
+      gif.save(frames,"gifs/"+name + "_normal_difussion.gif",duration=1000)

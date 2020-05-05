@@ -311,7 +311,7 @@ class GpnN:
     #print(labels)
     cbar.set_label('Norm', rotation=270)
     #plt.show()
-    plt.savefig(name + '.png')    
+    plt.savefig("img/"+name + '.png')    
     
 #--------------------------Parisi_Matrix--------------------------
   #following function returns the (i,j)-th value of Parisi Matrix

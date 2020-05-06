@@ -312,7 +312,22 @@ class GpnN:
     cbar.set_label('Norm', rotation=270)
     #plt.show()
     plt.savefig("img/"+name + '.png')    
-    
+#-------------------------Monna Map---------------------------
+  '''Monna map: takes a p-adic number that will be mapped 
+  into a positive real number. Following function is going to return a vector
+  which entries are the evaluation of such map on every number in the numbers
+  atributte of current class'''
+  def monna_map(self):
+    real_numbers = []
+    for pnumber in self.numbers:
+      j = pnumber.len() - 1
+      real_number = 0
+      for i in range(-self.__m, self.__M, 1):
+        real_number += (pnumber.p**(-i-1))*pnumber.digits[j] 
+        j -= 1
+      real_numbers.append(real_number)
+
+    return real_numbers
 #--------------------------Parisi_Matrix--------------------------
   #following function returns the (i,j)-th value of Parisi Matrix
   def fij(self, alpha, constant, i: Number, j: Number):

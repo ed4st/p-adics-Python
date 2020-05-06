@@ -21,9 +21,9 @@ class Number:
   def setn(self, m):
     self.__m = m
 
-  def getN(self):
+  def getM(self):
     return self.__M
-  def setN(self, M):
+  def setM(self, M):
     self.__M = M
 
   #-------------------------------------------------------

@@ -235,7 +235,7 @@ class GpnN:
     
     
     #Creating a list of p colors
-    basic_colors = ['k','r','b','gray','green','c','y','m']
+    basic_colors = ['orange','r','b','gray','green','c','y','m']
     if(self.p>len(basic_colors)-1):
       
       cm_linspace = linspace(0.0, 1.0, self.p-len(basic_colors))
@@ -248,10 +248,11 @@ class GpnN:
 
     pos  =  graphviz_layout(G, prog = 'twopi', args = '')
     tam = self.__M + self.__m + self.p
-    plt.figure(figsize = (int(tam**1.1),int(tam**1.1)))
+    fig = plt.figure(figsize = (int(tam**1.1),int(tam**1.1)))
 
     name = 'G' + str(self.p) + '_' + str(abs(self.n)) + str(self.N)
-    plt.title(name)
+    
+    plt.title(name,color='white')
     
     norms_set = set(norms)
     unique_norms = []
@@ -272,7 +273,7 @@ class GpnN:
     color_norms = []
     for i in norms:
       if(i == 0.0):
-        color_norms.append('white')
+        color_norms.append("#00000F")
       else:
         index = unique_norms.index(i)
         color_norms.append(unique_color[index])
@@ -280,6 +281,8 @@ class GpnN:
     cm_aux = ListedColormap(unique_color)#creating a color map
                         
     nx.draw(G, pos, node_size = int(1000/(tam**1.5)), alpha = 0.7, node_color  =  color_norms, edge_color  = color_of_edges,with_labels = False)
+    fig.set_facecolor("#00000F")#setting background color
+
     plt.axis('equal')
 
     #vertical colorbar
@@ -294,7 +297,7 @@ class GpnN:
     m3 = (mx-mn)*3/4  
     tks = linspace(0,1,2*len(unique_norms)+1)
 
-    cbar = plt.colorbar(sm, ticks = tks)
+    cbar = plt.colorbar(sm, ticks = tks,)
     
     labels = []
 
@@ -307,11 +310,17 @@ class GpnN:
     labels.append('')
     #cbar.set_ticks([mn,md,mx])
     #cbar.set_ticklabels([mn,md,mx])
-    cbar.ax.set_yticklabels(labels)
+    cbar.ax.set_yticklabels(labels, color='white')
     #print(labels)
-    cbar.set_label('Norm', rotation=270)
+    cbar.set_label('Norm', rotation=270, color='white')
+    
+    
+
+    #fig.patch.set_alpha(0.7)
+    
     #plt.show()
-    plt.savefig("img/"+name + '.png')    
+
+    plt.savefig("img/"+name + '_dark.png', facecolor=fig.get_facecolor())    
 #-------------------------Monna Map---------------------------
   '''Monna map: takes a p-adic number that will be mapped 
   into a positive real number. Following function is going to return a vector

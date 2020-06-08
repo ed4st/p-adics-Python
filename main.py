@@ -5,13 +5,18 @@ import matplotlib.pyplot as plt
 import time
 
 start_time = time.time()
-G2_22 = GpnN(2,-1,3) #initialization
-x = Number(7,-2,4,[2,4,6,3,2,2,6])
-G2_22.generate_numbers()
+for i in range(2,5):
+    for j in range(-2,-5,-1):
+       G2_22 = GpnN(5,j,i)
+       G2_22.generate_numbers()
+       G2_22.representation_tree()
+
+#initialization
+#x = Number(7,-2,4,[2,4,6,3,2,2,6])
+
 #print(G2_22.monna_map())
 #G2_22.ODESols()
 #G2_22.matrix()
-G2_22.representation_tree()
 #G2_22.console_printing()
 
 #G2_22.representation_tree()

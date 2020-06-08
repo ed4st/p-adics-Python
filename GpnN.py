@@ -273,7 +273,7 @@ class GpnN:
     color_norms = []
     for i in norms:
       if(i == 0.0):
-        color_norms.append("#00000F")
+        color_norms.append("#23373B")
       else:
         index = unique_norms.index(i)
         color_norms.append(unique_color[index])
@@ -281,7 +281,7 @@ class GpnN:
     cm_aux = ListedColormap(unique_color)#creating a color map
                         
     nx.draw(G, pos, node_size = int(1000/(tam**1.5)), alpha = 0.7, node_color  =  color_norms, edge_color  = color_of_edges,with_labels = False)
-    fig.set_facecolor("#00000F")#setting background color
+    fig.set_facecolor("#23373B")#setting background color
 
     plt.axis('equal')
 

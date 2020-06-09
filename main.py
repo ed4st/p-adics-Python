@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 import time
 
 start_time = time.time()
-for i in range(2,5):
-    for j in range(-2,-5,-1):
-       G2_22 = GpnN(5,j,i)
-       G2_22.generate_numbers()
-       G2_22.representation_tree()
+
+G2_22 = GpnN(5,-2,2)
+G2_22.generate_numbers()
+G2_22.export_gif()
+#G2_22.representation_tree()
 
 #initialization
 #x = Number(7,-2,4,[2,4,6,3,2,2,6])

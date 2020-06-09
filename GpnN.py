@@ -404,32 +404,32 @@ class GpnN:
   
   def ODESols(self, type_ic = None):
     #time points
-    t = np.linspace(0,10,4)
+    t = np.linspace(0,100,100)
 
     #initial condition
     u0 = []
     
-    if(type_ic != None):
+    #if(type_ic != None):
       #random initial condition
-      if(type_ic == 'random'):
-        u0 = [random.random() for i in range(len(self.numbers))]
-        plt.plot(u0)
-        plt.show()
+      #if(type_ic == 'random'):
+    u0 = [random.random() for i in range(len(self.numbers))]
+     #   plt.plot(u0)
+      #  plt.show()
       #ones initial condition
-      elif(type_ic == 'ones'):
-        u0 = [1 for i in range(len(self.numbers))]
-        plt.plot(u0)
-        plt.show()
+      #elif(type_ic == 'ones'):
+       # u0 = [1 for i in range(len(self.numbers))]
+        #plt.plot(u0)
+        #plt.show()
     #gauss bell like initial condition by default
-    else:
+    #else:
       #gauss bell centered at GpnN order divided by 2
-      center = len(self.numbers)/2
+      #center = len(self.numbers)/2
       #creating a partition on the interval [center-1,center+1] 
       #of size |GpnN|  
-      partition = linspace(center-0.5 ,center+0.5,len(self.numbers))
+      #partition = linspace(center-0.5 ,center+0.5,len(self.numbers))
       #here we evaluate the partition created above in
       #gauss bell function centered at GpnN order divided by 2 
-      u0= np.exp((partition-center)**2)/self.p
+      #u0= np.exp((partition-center)**2)/self.p
       #plt.plot(u0)
       #plt.show()
 
@@ -454,7 +454,7 @@ class GpnN:
   #--------------------------Creating image transitions---------------
   
   @gif.frame
-  def animate(self, boundary, time, type_ic = None):
+  def animate(self, boundary, time, contador, type_ic = None):
     try:
         import pygraphviz
         from networkx.drawing.nx_agraph import graphviz_layout
@@ -488,7 +488,7 @@ class GpnN:
     
     
     #Creating a list of p colors
-    basic_colors = ['k','r','b','gray','green','c','y','m']
+    basic_colors = ['orange','r','b','gray','green','c','y','m']
     if(self.p>len(basic_colors)-1):
       cm_linspace = linspace(0.0, 1.0, self.p-len(basic_colors))
       basic_colors = basic_colors + [cm.brg(x) for x in cm_linspace] 
@@ -500,23 +500,24 @@ class GpnN:
 
     pos  =  graphviz_layout(G, prog = 'twopi', args = '')
     tam = self.__M + self.__m + self.p
-    plt.figure(figsize = (int(tam**1.1),int(tam**1.1)))
+    fig = plt.figure(figsize = (int(tam**1.1),int(tam**1.1)))
 
 
     name = 'G' + str(self.p) + '_' + str(abs(self.n)) + str(self.N)
     
-    if(type_ic != None):
+    #if(type_ic != None):
       #random initial condition
-      if(type_ic == 'random'):
-        plt.title(name + ' difussion model with randomly distributed initial condition vector')
+      #if(type_ic == 'random'):
+        #plt.title(name + ' difussion model with randomly distributed initial condition vector')
       #ones initial condition
-      elif(type_ic == 'ones'):
-        plt.title(name + ' difussion model with $\\vec{1}$ initial condition vector')
+      #elif(type_ic == 'ones'):
+        #plt.title(name + ' difussion model with $\\vec{1}$ initial condition vector')
     #normal initial condition by default
-    else:
+    #else:
         #median = 0, variance = 1
-        plt.title(name + ' difussion model with normally distributed initial condition vector')
-    plt.text(2, 6, '$t =' + f"{time:.2f}" + '$', fontsize=15)
+        #plt.title(name + ' difussion model with normally distributed initial condition vector', color = 'white')
+        #plt.title(name + 'Proceso de ultradisusión con condición inicial con forma de campana ', color = 'white')
+    plt.text(2, 6, '$t =' + f"{time:.2f}" + '$', fontsize=15, color = 'white')
 
     
     
@@ -524,13 +525,14 @@ class GpnN:
     boundary_colors = []
     for i in norms:
       if(i == 0.0):
-        boundary_colors.append('white')
+        boundary_colors.append('#23373B')
       else:
         boundary_colors.append(self.__all_solutions_dict[i])
     
                         
     nx.draw(G, pos, node_size = int(1000/(tam**1.5)), alpha = 0.7, node_color  =  boundary_colors , edge_color  = color_of_edges,with_labels = False)
     plt.axis('equal')
+    fig.set_facecolor("#23373B")#setting background color
 
     #vertical colorbar
     sm = plt.cm.ScalarMappable(cmap = cm.jet)#cm_aux)
@@ -540,9 +542,10 @@ class GpnN:
     md = (mn+mx)/2
     tks = linspace(0,1,3)
     cbar = plt.colorbar(sm, ticks = tks )
-    cbar.ax.set_yticklabels([f"{mn:.3f}", f"{md:.3f}",f"{mx:.3f}"])
-    cbar.set_label('solution values', rotation=270)
-
+    cbar.ax.set_yticklabels([f"{mn:.3f}", f"{md:.2f}",f"{mx:.3f}"], color = 'white')
+    cbar.set_label('solution values', rotation=270, color = 'white')
+    
+    plt.savefig("img/random/"+str(contador) + '.png', facecolor=fig.get_facecolor())
     #plt.show()
   '''
   following function returns a gif showing
@@ -558,12 +561,15 @@ class GpnN:
     frames = []
     u = self.ODESols(type_ic)
     
+    contador = 0
     for u_i, t_i in zip(u[0],u[1]):
-      frame = self.animate(u_i,t_i,type_ic)
-      frames.append(frame)
+      self.animate(u_i,t_i,contador,type_ic)
+      contador += 1
+    #  frame = self.animate(u_i,t_i,type_ic, index)
+    #  frames.append(frame)
 
-    name = 'G' + str(self.p) + '_' + str(abs(self.n)) + str(self.N)
-    if(type_ic!=None):
-      gif.save(frames,name + "_" +type_ic +"_difussion.gif",duration=1000)
-    else:
-      gif.save(frames,"gifs/"+name + "_normal_difussion.gif",duration=1000)
+    #name = 'G' + str(self.p) + '_' + str(abs(self.n)) + str(self.N)
+    #f(type_ic!=None):
+    #  gif.save(frames,name + "_" +type_ic +"_difussion.gif",duration=1000)
+    #else:
+    #  gif.save(frames,"gifs/"+name + "_normal_difussion.gif",duration=1000)

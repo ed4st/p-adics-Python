@@ -363,7 +363,7 @@ class GpnN:
     for i in range(len(W)):  
       W[i][i] = w0 
     
-    '''
+    
     #matrix visualization
     fig, ax = plt.subplots()
     ax.matshow(W, cmap = plt.cm.get_cmap("jet"))
@@ -375,7 +375,7 @@ class GpnN:
     #colorbar
     sm = plt.cm.ScalarMappable(cmap = cm.jet)
     sm._A = []
-
+    fig.set_facecolor("#23373B")#setting background color
     mn = min(W[0])      # colorbar min value
     mx = max(W[0])       # colorbar max value
     
@@ -383,11 +383,13 @@ class GpnN:
     tks = linspace(0,1,3)#2*(self.__m+self.__M+1))
 
     cbar = plt.colorbar(sm, ticks = tks)
-    cbar.ax.set_yticklabels([f"{mn:.2f}",f"{md:.2f}" , f"{mx:.2f}"])
+    cbar.ax.set_yticklabels([f"{mn:.2f}",f"{md:.2f}" , f"{mx:.2f}"], color = 'white')
+    
+    
     #plt.show()
     name = 'G'+str(self.p)+'_'+str(-self.n)+str(self.N)
-    plt.title('Transition Matrix of ' + name + ' with $\\alpha='+str(alpha)+'$ and $C='+str(constant)+'$')
-    plt.savefig('matrix'+name+'.png')'''
+    #plt.title('Transition Matrix of ' + name + ' with $\\alpha='+str(alpha)+'$ and $C='+str(constant)+'$')
+    plt.savefig('img/matrix/'+name+'.png', facecolor=fig.get_facecolor())
 
 
     return W

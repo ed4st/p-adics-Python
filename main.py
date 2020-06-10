@@ -6,9 +6,10 @@ import time
 
 start_time = time.time()
 
-G2_22 = GpnN(5,-2,2)
+G2_22 = GpnN(2,-1,1)
 G2_22.generate_numbers()
-G2_22.export_gif()
+
+#G2_22.export_gif()
 #G2_22.representation_tree()
 
 #initialization
@@ -16,7 +17,7 @@ G2_22.export_gif()
 
 #print(G2_22.monna_map())
 #G2_22.ODESols()
-#G2_22.matrix()
+G2_22.matrix()
 #G2_22.console_printing()
 
 #G2_22.representation_tree()
